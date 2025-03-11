@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Name Matcher</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="container">
+    <h1>Name Matcher</h1>
+    <label for="nameInput">Enter Name:</label>
+    <input type="text" id="nameInput" placeholder="Enter name to add" />
+    <button id="addName">Add Name</button>
+
+    <h3>Names List:</h3>
+    <ul id="namesList"></ul>
+
+    <h3>Generate Match:</h3>
+    <button id="generateMatch">Generate Match</button>
+    <div class="matchResult" id="matchResult"></div>
+  </div>
+
+  <div id="approveButtons" style="display: none;">
+    <button id="approveMatch">Approve Match</button>
+    <button id="denyMatch">Deny Match</button>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
