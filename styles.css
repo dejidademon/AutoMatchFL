@@ -1,75 +1,108 @@
 body {
-    font-family: Arial, sans-serif;
-    background-color: #f4f4f9;
-    margin: 0;
-    padding: 0;
-  }
-  
-  .container {
-    width: 80%;
-    max-width: 600px;
-    margin: 0 auto;
-    padding: 20px;
-    background-color: #fff;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    border-radius: 8px;
-  }
-  
-  h1 {
-    text-align: center;
-    color: #333;
-  }
-  
-  label {
-    font-size: 1rem;
-    margin-bottom: 10px;
-    display: block;
-  }
-  
-  input {
-    width: 100%;
-    padding: 10px;
-    margin-bottom: 15px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    font-size: 1rem;
-  }
-  
-  button {
-    width: 100%;
-    padding: 10px;
-    background-color: #4CAF50;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    font-size: 1rem;
-    cursor: pointer;
-  }
-  
-  button:hover {
-    background-color: #45a049;
-  }
-  
-  .matchResult {
-    margin-top: 20px;
-    padding: 10px;
-    background-color: #e7f7e7;
-    border-radius: 5px;
-    text-align: center;
-    font-size: 1.2rem;
-    font-weight: bold;
-    color: #4CAF50;
-  }
-  
-  ul {
-    list-style-type: none;
-    padding-left: 0;
-  }
-  
-  li {
-    background-color: #f0f0f0;
-    margin: 5px 0;
-    padding: 8px;
-    border-radius: 4px;
-  }
-  
+  font-family: 'Comic Sans MS', cursive, sans-serif;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: #f0f8ff;
+}
+
+.container {
+  display: flex;
+  width: 80%;
+  max-width: 1200px;
+  background-color: #fff;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  border-radius: 16px;
+  overflow: hidden;
+  position: relative;
+}
+
+.sidebar {
+  width: 25%;
+  background-color: #e6f7ff;
+  padding: 20px;
+  border-right: 1px solid #ddd;
+  overflow-y: auto;
+}
+
+.sidebar h3 {
+  margin-top: 0;
+  color: #007bff;
+}
+
+.names-columns {
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 60px); /* Adjust height to fill the screen */
+  overflow-y: auto;
+}
+
+.names-columns ul {
+  width: 100%; /* Full width */
+  margin: 0;
+  padding: 0;
+  list-style-type: none;
+}
+
+.main-content {
+  width: 75%;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.main-content h1 {
+  margin-top: 0;
+  color: black;
+}
+
+input[type="text"] {
+  width: calc(100% - 22px);
+  padding: 10px;
+  margin-bottom: 10px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+}
+
+button {
+  padding: 10px 20px;
+  border: none;
+  background-color: #36e37a;
+  color: #fff;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+button:hover {
+  background-color: #36e37a;
+}
+
+.matchResult {
+  margin-top: 20px;
+  color: #36e37a;
+}
+
+ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+ul li {
+  padding: 10px;
+  margin-bottom: 5px;
+  border-radius: 8px;
+  background-color: #e6f7ff;
+  border: 1px solid #36e37a;
+  color: #000000;
+}
+
+#matchesList {
+  max-height: 300px; /* Fixed height for matches list */
+  overflow-y: auto;
+}

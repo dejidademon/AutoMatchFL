@@ -4,28 +4,288 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Name Matcher</title>
-  <link rel="stylesheet" href="styles.css">
+  <style> 
+body {
+  font-family: 'Comic Sans MS', cursive, sans-serif;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: #f0f8ff;
+}
+
+.container {
+  display: flex;
+  width: 80%;
+  max-width: 1200px;
+  background-color: #fff;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  border-radius: 16px;
+  overflow: hidden;
+  position: relative;
+}
+
+.sidebar {
+  width: 25%;
+  background-color: #e6f7ff;
+  padding: 20px;
+  border-right: 1px solid #ddd;
+  overflow-y: auto;
+}
+
+.sidebar h3 {
+  margin-top: 0;
+  color: #007bff;
+}
+
+.names-columns {
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 60px); /* Adjust height to fill the screen */
+  overflow-y: auto;
+}
+
+.names-columns ul {
+  width: 100%; /* Full width */
+  margin: 0;
+  padding: 0;
+  list-style-type: none;
+}
+
+.main-content {
+  width: 75%;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.main-content h1 {
+  margin-top: 0;
+  color: black;
+}
+
+input[type="text"] {
+  width: calc(100% - 22px);
+  padding: 10px;
+  margin-bottom: 10px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+}
+
+button {
+  padding: 10px 20px;
+  border: none;
+  background-color: #36e37a;
+  color: #fff;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+button:hover {
+  background-color: #36e37a;
+}
+
+.matchResult {
+  margin-top: 20px;
+  color: #36e37a;
+}
+
+ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+ul li {
+  padding: 10px;
+  margin-bottom: 5px;
+  border-radius: 8px;
+  background-color: #e6f7ff;
+  border: 1px solid #36e37a;
+  color: #000000;
+}
+
+#matchesList {
+  max-height: 300px; /* Fixed height for matches list */
+  overflow-y: auto;
+}
+
+  </style>
 </head>
 <body>
   <div class="container">
-    <h1>Name Matcher</h1>
-    <label for="nameInput">Enter Name:</label>
-    <input type="text" id="nameInput" placeholder="Enter name to add" />
-    <button id="addName">Add Name</button>
+    <div class="sidebar">
+      <h3>Names List:</h3>
+      <div class="names-columns">
+        <ul id="namesList"></ul>
+      </div>
+    </div>
+    <div class="main-content">
+      <h1>Name Matcher</h1>
+      <label for="nameInput">Enter Name:</label>
+      <input type="text" id="nameInput" placeholder="Enter name to add" />
+      <button id="addName">Add Name</button>
 
-    <h3>Names List:</h3>
-    <ul id="namesList"></ul>
+      <h3>Generate Match:</h3>
+      <button id="generateMatch">Generate Match</button>
+      <div class="matchResult" id="matchResult"></div>
 
-    <h3>Generate Match:</h3>
-    <button id="generateMatch">Generate Match</button>
-    <div class="matchResult" id="matchResult"></div>
+      <h3>Matches Made:</h3>
+      <ul id="matchesList"></ul>
+    </div>
   </div>
+  <script type="module">
 
-  <div id="approveButtons" style="display: none;">
-    <button id="approveMatch">Approve Match</button>
-    <button id="denyMatch">Deny Match</button>
-  </div>
 
-  <script src="script.js"></script>
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.1.0/firebase-app.js";
+import { getFirestore, collection, getDocs, onSnapshot, doc, setDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.1.0/firebase-firestore.js";
+
+const firebaseConfig = {
+      apiKey: "AIzaSyBDT4f3ySHJK2deiobeJOO7qDLzZQj1To4",
+      authDomain: "automatch-64fd2.firebaseapp.com",
+      databaseURL: "https://automatch-64fd2-default-rtdb.firebaseio.com",
+      projectId: "automatch-64fd2",
+      storageBucket: "automatch-64fd2.firebasestorage.app",
+      messagingSenderId: "432508546895",
+      appId: "1:432508546895:web:0fc9cd1222f2c1a8e25f3a",
+      measurementId: "G-32T0TYHQF9"
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+
+async function fetchNames() {
+  try {
+    const namesSnapshot = await getDocs(collection(db, 'names'));
+    const namesList = document.getElementById('namesList');
+    namesList.innerHTML = '';
+    namesSnapshot.forEach((nameDoc) => {
+      const li = document.createElement('li');
+      li.textContent = nameDoc.id;
+      li.addEventListener('click', async () => {
+        if (confirm(`Are you sure you want to delete the name "${nameDoc.id}"?`)) {
+          try {
+            await deleteDoc(doc(db, 'names', nameDoc.id));
+            fetchNames(); // Refresh the list of names
+          } catch (error) {
+            console.error('Error deleting name:', error);
+          }
+        }
+      });
+      namesList.appendChild(li);
+    });
+  } catch (error) {
+    console.error('Error fetching names:', error);
+  }
+}
+
+
+
+
+async function fetchMatches() {
+  try {
+    const matchesSnapshot = await getDocs(collection(db, 'matches'));
+    const matchesList = document.getElementById('matchesList');
+    matchesList.innerHTML = '';
+    matchesSnapshot.forEach(matchDoc => {
+      const match = matchDoc.data().match;
+      const li = document.createElement('li');
+      li.textContent = `${match[0]} and ${match[1]}`;
+      li.addEventListener('click', async () => {
+        if (confirm(`Are you sure you want to delete the match "${match[0]} and ${match[1]}"?`)) {
+          try {
+            await deleteDoc(doc(db, 'matches', matchDoc.id));
+            fetchMatches(); // Refresh the list of matches
+          } catch (error) {
+            console.error('Error deleting match:', error);
+          }
+        }
+      });
+      matchesList.appendChild(li);
+    });
+  } catch (error) {
+    console.error('Error fetching matches:', error);
+  }
+}
+
+// Add Name Event Listener
+document.getElementById('addName').addEventListener('click', async () => {
+  const nameInput = document.getElementById('nameInput').value.trim();
+  
+  if (nameInput === '') {
+    alert("Please enter a valid name.");
+    return;
+  }
+
+  try {
+    await setDoc(doc(db, 'names', nameInput), { name: nameInput });
+    document.getElementById('nameInput').value = ''; // Clear the input field
+    fetchNames(); // Refresh the list of names
+  } catch (error) {
+    console.error('Error adding name:', error);
+  }
+});
+
+// Generate Match Event Listener
+document.getElementById('generateMatch').addEventListener('click', async () => {
+  try {
+    const namesSnapshot = await getDocs(collection(db, 'names'));
+    const names = namesSnapshot.docs.map(doc => doc.id);
+    let availableMatches = [];
+    for (let i = 0; i < names.length; i++) {
+      for (let j = i + 1; j < names.length; j++) {
+        availableMatches.push([names[i], names[j]]);
+      }
+    }
+
+    const matchesSnapshot = await getDocs(collection(db, 'matches'));
+    const existingMatches = matchesSnapshot.docs.map(doc => doc.id);
+
+    const possibleMatches = availableMatches.filter(match => {
+      const matchId = `${match[0]}-${match[1]}`;
+      return !existingMatches.includes(matchId);
+    });
+
+    if (possibleMatches.length === 0) {
+      document.getElementById('matchResult').innerHTML = 'No available matches';
+      return;
+    }
+
+    const randomMatch = possibleMatches[Math.floor(Math.random() * possibleMatches.length)];
+    const matchResult = document.getElementById('matchResult');
+    matchResult.innerHTML = `Match: ${randomMatch[0]} and ${randomMatch[1]}
+      <button id="acceptMatch">Accept</button>
+      <button id="declineMatch">Decline</button>`;
+    
+    document.getElementById('acceptMatch').addEventListener('click', async () => {
+      try {
+        await setDoc(doc(db, 'matches', `${randomMatch[0]}-${randomMatch[1]}`), { match: randomMatch });
+        matchResult.innerHTML = 'Match accepted!';
+        fetchMatches(); // Refresh the list of matches
+      } catch (error) {
+        console.error('Error accepting match:', error);
+      }
+    });
+
+    document.getElementById('declineMatch').addEventListener('click', () => {
+      matchResult.innerHTML = 'Match declined!';
+    });
+  } catch (error) {
+    console.error('Error generating match:', error);
+  }
+});
+
+// Fetch names and matches on page load
+fetchNames();
+fetchMatches();
+
+
+  </script>
 </body>
 </html>
