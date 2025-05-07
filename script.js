@@ -38,8 +38,27 @@ async function fetchMatches() {
   }
 }
 
-
-
+async function populateNameSelectors() {
+  try {
+    const namesSnapshot = await getDocs(collection(db, 'names'));
+    const nameSelect1 = document.getElementById('nameSelect1');
+    const nameSelect2 = document.getElementById('nameSelect2');
+    nameSelect1.innerHTML = '<option value="">Select Name 1</option>';
+    nameSelect2.innerHTML = '<option value="">Select Name 2</option>';
+    namesSnapshot.forEach((doc) => {
+      const option1 = document.createElement('option');
+      const option2 = document.createElement('option');
+      option1.value = doc.id;
+      option1.textContent = doc.id;
+      option2.value = doc.id;
+      option2.textContent = doc.id;
+      nameSelect1.appendChild(option1);
+      nameSelect2.appendChild(option2);
+    });
+  } catch (error) {
+    console.error('Error populating name selectors:', error);
+  }
+}
 
 // Add Name Event Listener
 document.getElementById('addName').addEventListener('click', async () => {
@@ -108,7 +127,27 @@ document.getElementById('generateMatch').addEventListener('click', async () => {
   }
 });
 
+document.getElementById('createMatch').addEventListener('click', async () => {
+  const name1 = document.getElementById('nameSelect1').value;
+  const name2 = document.getElementById('nameSelect2').value;
+
+  if (!name1 || !name2 || name1 === name2) {
+    alert('Please select two different names.');
+    return;
+  }
+
+  try {
+    const matchId = `${name1}-${name2}`;
+    await setDoc(doc(db, 'matches', matchId), { match: [name1, name2] });
+    alert('Match created successfully!');
+    fetchMatches(); // Refresh the list of matches
+  } catch (error) {
+    console.error('Error creating match:', error);
+  }
+});
+
 // Fetch names and matches on page load
 fetchNames();
 fetchMatches();
+populateNameSelectors();
 runThis();
